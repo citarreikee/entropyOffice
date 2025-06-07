@@ -33,7 +33,7 @@ if __name__ == "__main__":
     HA_URL = "http://192.168.0.18:8123"
     ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI2OTFhNWNjMThlOTM0MmI2OTdmNTVlNGZmNmEwYThlYiIsImlhdCI6MTc0ODg0OTQyMiwiZXhwIjoyMDY0MjA5NDIyfQ.1HTLOmqphNp2Mv--Krj_nvNHkjhWAGCgQ2CztKd4sx8"
     
-    ENTITY_ID = "remote.xiaomi_lx06_c3ba_wifispeaker"
+    ENTITY_ID = "text.xiaomi_lx06_c3ba_play_text"
     speaker = WifiSpaekerlx06(HA_URL, ACCESS_TOKEN, ENTITY_ID)
     res = speaker.play_text("hello,瓦达西瓦孙笑川")
     print(res)

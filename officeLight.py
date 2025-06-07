@@ -42,6 +42,7 @@ class OfficeLight:
     # 灯光状态属性
     @property
     def status(self):
+        self.update_state()
         return self._status
     
    
@@ -63,20 +64,20 @@ class OfficeLight:
     
     def turn_on(self):
         payload = {"entity_id": self.entity_id}
-        self.set_property("switch","turn_on",payload)
-        self.update_state()
-        return f"开灯{'成功' if self.status=='on' else '失败'}"
+        res = self.set_property("switch","turn_on",payload)
+        
+        return f"开灯{'成功' if res.status_code==200 else '失败'}"
     
     def turn_off(self):
         payload = {"entity_id": self.entity_id}
         res = self.set_property("switch","turn_off",payload)
-        self.update_state()
-        return f"关灯{'成功' if self.status=='off' else '失败'}"
+        
+        return f"关灯{'成功' if res.status_code==200 else '失败'}"
     
     def toggle(self):
         payload = {"entity_id": self.entity_id}
         res = self.set_property("switch","toggle",payload)
-        self.update_state()
+        
         return f"开关状态切换命令发送{'成功' if res.status_code==200 else '失败'}"
     
 

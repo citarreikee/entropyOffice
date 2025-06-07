@@ -1,75 +1,133 @@
 import json
 import requests
 
-HOME_ASSISTANT_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIzYTFkYWFhNDYyMzU0MDI4YjFlNzMyMjVkMGY4ODU0ZSIsImlhdCI6MTc0NzEzNDQzNSwiZXhwIjoyMDYyNDk0NDM1fQ.TRjIzXXVdn39LEyeGOgceL6ux7c408VJ83kKL0DXu1Q"
 
-# 控制设备函数的具体实现，使用Home Assistant的Restful API
-# 具体见文档https://developers.home-assistant.io/docs/api/rest/
-# 小米参数 https://home.miot-spec.com/
 class YeelinkLamp22Cad9Light:
-    def __init__(self, token):
+    def __init__(self, ha_url, token, entity_id):
         self.set_miot_property_url = "http://192.168.0.18:8123/api/services/xiaomi_miot/set_miot_property"
         self.call_action_url = "http://192.168.0.18:8123/api/services/xiaomi_miot/call_action"
+        self.ha_url = ha_url.rstrip('/')
         self.headers = {
-            'Content-Type': 'application/json',
-            'Authorization': f'Bearer {token}'
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json",
         }
-        self.entity_id = "light.yeelink_lamp22_cad9_light"
+        self.entity_id = entity_id
 
-    def set_light_brightness(self, brightness, siid=2):
-        payload = json.dumps({
+        # 初始化状态属性 (可读可写)
+        self._status = 'off'
+        self._brightness = 1
+        self._color_temperature = 2700
+    
+    def get_property(self):
+        get_property_url = f"{self.ha_url}/api/states/{self.entity_id}"
+        try:
+            response = requests.get(get_property_url, headers=self.headers, timeout=5)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            print(f"Request failed for {self.entity_id}: {e}")
+        except Exception as ex:
+            print(f"Error processing entity {self.entity_id}: {ex}")
+        return None
+    
+    def update_state(self):
+        """从Home Assistant获取最新状态并更新属性"""
+        state_data = self.get_property()
+        if not state_data:
+            return False
+        
+        attrs = state_data.get('attributes', {})
+        # 更新开关状态 (优先使用light.on，其次根据state判断)
+        self._status = attrs.get('light.on', state_data['state'] != 'off')
+        # 更新亮度状态
+        self._brightness = attrs.get('light.brightness')
+        # 更新色温状态
+        self._color_temperature = attrs.get('light.color_temperature')
+
+        return True
+    
+    # 灯光状态属性
+    @property
+    def status(self):
+        self.update_state()
+        return self._status
+    
+    @property
+    def brightness(self):
+        self.update_state()
+        return self._brightness
+    
+    @property
+    def color_temperature(self):
+        self.update_state()
+        return self._color_temperature
+    
+    # 灯光控制
+
+    def set_property(self,domain,service,payload):
+        set_property_url = f"{self.ha_url}/api/services/{domain}/{service}"
+        
+        try:
+            response = requests.post(set_property_url, headers=self.headers,json=payload, timeout=5)
+            response.raise_for_status()
+            return response
+        except requests.exceptions.RequestException as e:
+            print(f"Request failed for {self.entity_id}: {e}")
+        except Exception as ex:
+            print(f"Error processing entity {self.entity_id}: {ex}")
+        return None
+
+    def set_light_brightness(self, brightness):
+        payload = {
             "entity_id": self.entity_id,
-            "siid": siid,
+            "siid": 2,
             "piid": 2,
             "value": brightness
-        })
-        response = requests.request("POST", self.set_miot_property_url, headers=self.headers, data=payload)
-        return "命令已发送"
+        }
+        res = self.set_property("xiaomi_miot","set_miot_property",payload)
+        
+        return f"亮度设置为{brightness}{'成功' if res.status_code==200 else '失败'}"
 
-    def set_light_color_temperature(self, temperature, siid=2):
-        payload = json.dumps({
+    def set_light_color_temperature(self, temperature):
+        payload = {
             "entity_id": self.entity_id,
-            "siid": siid,
+            "siid": 2,
             "piid": 3,
             "value": temperature
-        })
-        response = requests.request("POST", self.set_miot_property_url, headers=self.headers, data=payload)
-        return "命令已发送"
-    
-    def toggle(self, siid=2):
-        payload = json.dumps({
-            "entity_id": self.entity_id,
-            "siid": siid,
-            "aiid": 1,
-        })
-        response = requests.request("POST", self.call_action_url, headers=self.headers, data=payload)
-        return response
+        }
+        res = self.set_property("xiaomi_miot","set_miot_property",payload)
+        
+        return f"色温设置为{temperature}{'成功' if res.status_code==200 else '失败'}"
     
     def turn_on(self):
-        payload = json.dumps({
-            "entity_id": self.entity_id            
-        })
-        url = "http://192.168.0.18:8123/api/services/light/turn_on"
-        response = requests.request("POST", url, headers=self.headers, data=payload)
-        return response
+        payload = {"entity_id": self.entity_id}
+        res = self.set_property("switch","turn_on",payload)
+        
+        return f"开灯{'成功' if res.status_code==200 else '失败'}"
     
     def turn_off(self):
-        payload = json.dumps({
-            "entity_id": self.entity_id            
-        })
-        url = "http://192.168.0.18:8123/api/services/light/turn_off"
-        response = requests.request("POST", url, headers=self.headers, data=payload)
-        return response
+        payload = {"entity_id": self.entity_id}
+        res = self.set_property("switch","turn_off",payload)
+        
+        return f"关灯{'成功' if res.status_code==200 else '失败'}"
     
-# Successful calls will return status code 200 or 201. Other status codes that can return are:
+    def toggle(self):
+        payload = {"entity_id": self.entity_id}
+        res = self.set_property("switch","toggle",payload)
+        
+        return f"开关状态切换命令发送{'成功' if res.status_code==200 else '失败'}"
+    
 
-# 400 (Bad Request)
-# 401 (Unauthorized)
-# 404 (Not Found)
-# 405 (Method Not Allowed)
-
-
-
+# if __name__ == "__main__":
+#     HA_URL = "http://192.168.0.18:8123"
+#     ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI2OTFhNWNjMThlOTM0MmI2OTdmNTVlNGZmNmEwYThlYiIsImlhdCI6MTc0ODg0OTQyMiwiZXhwIjoyMDY0MjA5NDIyfQ.1HTLOmqphNp2Mv--Krj_nvNHkjhWAGCgQ2CztKd4sx8"
+    
+#     ENTITY_ID = "light.yeelink_lamp22_cad9_light"
+#     light = YeelinkLamp22Cad9Light(HA_URL,ACCESS_TOKEN,ENTITY_ID)
+#     res = light.turn_off()
+#     print(res)
+#     res = light.turn_on()
+#     print(res)
 
 
 
