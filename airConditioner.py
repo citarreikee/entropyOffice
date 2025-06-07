@@ -139,27 +139,27 @@ class AirConditioner:
         return f"空调设置风速为{speed_level}{'成功' if res.status_code==200 else '失败'}"
 
     
-if __name__ == "__main__":
-    HA_URL = "http://192.168.0.18:8123"
-    ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI2OTFhNWNjMThlOTM0MmI2OTdmNTVlNGZmNmEwYThlYiIsImlhdCI6MTc0ODg0OTQyMiwiZXhwIjoyMDY0MjA5NDIyfQ.1HTLOmqphNp2Mv--Krj_nvNHkjhWAGCgQ2CztKd4sx8"
-    ENTITY_ID = "climate.giot_v1itcw_8957_thermostat"
+# if __name__ == "__main__":
+#     HA_URL = "http://192.168.0.18:8123"
+#     ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI2OTFhNWNjMThlOTM0MmI2OTdmNTVlNGZmNmEwYThlYiIsImlhdCI6MTc0ODg0OTQyMiwiZXhwIjoyMDY0MjA5NDIyfQ.1HTLOmqphNp2Mv--Krj_nvNHkjhWAGCgQ2CztKd4sx8"
+#     ENTITY_ID = "climate.giot_v1itcw_8957_thermostat"
 
-    ac = AirConditioner(HA_URL, ACCESS_TOKEN, ENTITY_ID)
-    # # 打印当前状态
-    # print("当前状态:")
-    # print(f"电源: {'开启' if ac.power_status else '关闭'}")
-    # print(f"模式: {ac.mode}")
-    # print(f"目标温度: {ac.target_temp}°C")
-    # print(f"当前温度: {ac.current_temp}°C")
-    # print(f"风速等级: {ac.fan_speed}")
-    # print(f"湿度: {ac.humidity}%")
+#     ac = AirConditioner(HA_URL, ACCESS_TOKEN, ENTITY_ID)
+#     # # 打印当前状态
+#     # print("当前状态:")
+#     # print(f"电源: {'开启' if ac.power_status else '关闭'}")
+#     # print(f"模式: {ac.mode}")
+#     # print(f"目标温度: {ac.target_temp}°C")
+#     # print(f"当前温度: {ac.current_temp}°C")
+#     # print(f"风速等级: {ac.fan_speed}")
+#     # print(f"湿度: {ac.humidity}%")
 
     
-    res = ac.set_temperature(19)
-    print(res.status_code)
-    # ac.set_mode('cool')
-    # ac.set_fan_speed('Low')
+#     res = ac.set_temperature(19)
+#     print(res.status_code)
+#     # ac.set_mode('cool')
+#     # ac.set_fan_speed('Low')
     
-    # res = ac.get_property()
-    # print(res)
+#     # res = ac.get_property()
+#     # print(res)
     

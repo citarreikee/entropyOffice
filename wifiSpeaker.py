@@ -1,34 +1,43 @@
 import json
-import logging
-import uuid
-
-from config import HOME_ASSISTANT_TOKEN
-
 import requests
 
-
-# 控制设备函数的具体实现，使用Home Assistant的Restful API
-# 具体见文档https://developers.home-assistant.io/docs/api/rest/
-# 小米参数 https://home.miot-spec.com/
 class WifiSpaekerlx06:
-    def __init__(self, token):
-        self.set_miot_property_url = "http://192.168.0.35:8123/api/services/xiaomi_miot/set_miot_property"
-        self.call_action_url = "http://192.168.0.35:8123/api/services/xiaomi_miot/call_action"
+    def __init__(self, ha_url, token, entity_id):
+        self.ha_url = ha_url.rstrip('/')
         self.headers = {
-            'Content-Type': 'application/json',
-            'Authorization': f'Bearer {token}'
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json",
         }
-        self.entity_id = "remote.xiaomi_lx06_c3ba_wifispeaker"
+        self.entity_id = entity_id
+        
+    # 控制功能
+    def set_property(self,domain,service,payload):
+        set_property_url = f"{self.ha_url}/api/services/{domain}/{service}"
+        
+        try:
+            response = requests.post(set_property_url, headers=self.headers,json=payload, timeout=5)
+            response.raise_for_status()
+            return response
+        except requests.exceptions.RequestException as e:
+            print(f"Request failed for {self.entity_id}: {e}")
+        except Exception as ex:
+            print(f"Error processing entity {self.entity_id}: {ex}")
+        return None
 
     def play_text(self, text_to_speak):
-        payload = json.dumps({
-            "entity_id": self.entity_id,
-            "siid": 5,
-            "aiid": 1,
-            "params": text_to_speak
-        })
-        response = requests.request("POST", self.call_action_url, headers=self.headers, data=payload)
-        return response
+        payload = {"entity_id": self.entity_id,"value":text_to_speak}
+        res = self.set_property("text","set_value",payload)
+        return f"播放内容{'成功' if res.status_code==200 else '失败'}"
+    
+if __name__ == "__main__":
+    HA_URL = "http://192.168.0.18:8123"
+    ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI2OTFhNWNjMThlOTM0MmI2OTdmNTVlNGZmNmEwYThlYiIsImlhdCI6MTc0ODg0OTQyMiwiZXhwIjoyMDY0MjA5NDIyfQ.1HTLOmqphNp2Mv--Krj_nvNHkjhWAGCgQ2CztKd4sx8"
+    
+    ENTITY_ID = "remote.xiaomi_lx06_c3ba_wifispeaker"
+    speaker = WifiSpaekerlx06(HA_URL, ACCESS_TOKEN, ENTITY_ID)
+    res = speaker.play_text("hello,瓦达西瓦孙笑川")
+    print(res)
+    
     
 
     
