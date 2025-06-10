@@ -1,5 +1,5 @@
 from devices import *
-import asyncio
+
 
 
 # 空调ID映射
@@ -297,7 +297,26 @@ async def parse_function_call(model_response, messages):
                     "name": func_name,
                     "content": response_content
                 })
+            elif func_name == "RouterQuery":                
+                try:
+                    result = str(router.online_devices)
+                    response_content = result
+                except Exception as e:
+                    response_content = f"路由器查询出错: {str(e)}"
                 
+                tool_responses.append({
+                    "tool_call_id": tool_call,
+                    "role": "tool",
+                    "name": func_name,
+                    "content": response_content
+                })
+                print({
+                    "tool_call_id": tool_call,
+                    "role": "tool",
+                    "name": func_name,
+                    "content": response_content
+                })
+
             else:
                 tool_responses.append({
                     "tool_call_id": tool_call,
