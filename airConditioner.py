@@ -3,6 +3,44 @@ import requests
 
 class AirConditioner:
     def __init__(self, ha_url, token, entity_id):
+        self.tools = {
+        "type": "function",
+        "function": {
+            "name": "AirConditionerControl",
+            "description": "控制办公室空调系统，支持开关机、温度调节、模式选择、风速设置和状态查询功能",
+            "parameters": {
+            "type": "object",
+            "properties": {
+                "acID": {
+                "type": "integer",
+                "description": "要控制的空调编号",
+                },
+                "action": {
+                "type": "string",
+                "description": "要执行的操作类型，从以下枚举值中选其一",
+                "enum": ["turn_on", "turn_off", "set_temperature", "set_mode", "set_fan_speed", "query_status"]
+                },
+                "temperature": {
+                "type": "number",
+                "description": "目标温度值（摄氏度），仅当action为set_temperature时使用",
+                "minimum": 16,
+                "maximum": 30
+                },
+                "mode": {
+                "type": "string",
+                "description": "工作模式，仅当action为set_mode时使用",
+                "enum": ["auto", "heat", "cool", "fan_only"]
+                },
+                "fan_speed": {
+                "type": "string",
+                "description": "风速等级，仅当action为set_fan_speed时使用",
+                "enum": ["Auto", "Low", "Medium", "High"]
+                }
+            },
+            "required": ["acID", "action"],
+            }
+        }
+        }
         self.ha_url = ha_url.rstrip('/')
         self.headers = {
             "Authorization": f"Bearer {token}",

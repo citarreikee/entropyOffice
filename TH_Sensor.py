@@ -5,6 +5,23 @@ from typing import Callable, Dict, Any
 
 class TH_Sensor:
     def __init__(self, ha_url: str, token: str, entity_id: str):
+        self.tools = {
+        "type": "function",
+        "function": {
+            "name": "TH_SensorQuery",
+            "description": "查询温湿度计的读数",
+            "parameters": {
+            "type": "object",
+            "properties": {
+                "thID": {
+                "type": "integer",
+                "description": "要查询的温湿度计编号",
+                },                
+            },  
+            "required": ["thID"]
+            }
+        }
+        }
         self.ha_url = ha_url.rstrip('/')
         self.headers = {
             "Authorization": f"Bearer {token}",

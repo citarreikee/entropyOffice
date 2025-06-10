@@ -5,7 +5,7 @@ import asyncio
 import warnings
 from airConditioner import AirConditioner
 import ssl
-from TH_Sensor import TH_Sensor
+
 
 import time
 import sys

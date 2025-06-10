@@ -3,6 +3,23 @@ import requests
 
 class WifiSpaekerlx06:
     def __init__(self, ha_url, token, entity_id):
+        self.tools = {
+        "type": "function",
+        "function": {
+            "name": "SpeakerControl",
+            "description": "控制音箱播放特定的内容",
+            "parameters": {
+            "type": "object",
+            "properties": {
+                "text": {
+                "type": "string",
+                "description": "要播放的文字内容，简短连续，不能有特殊符号"
+                }
+            },
+            "required": ["text"]
+            }
+        }
+        }
         self.ha_url = ha_url.rstrip('/')
         self.headers = {
             "Authorization": f"Bearer {token}",

@@ -16,7 +16,7 @@ HALLWAY_LIGHT_ID = "switch.xiaomi_2wpro3_de32_right_switch_service"
 hallway_light = OfficeLight(HA_URL, ACCESS_TOKEN, HALLWAY_LIGHT_ID)
 
 # 初始化办公室空调
-AC1_ID = "climate.giot_v1itcw_8957_thermostat"
+AC1_ID = "climate.san_9909a_3567_thermostat"
 ac1 = AirConditioner(HA_URL, ACCESS_TOKEN, AC1_ID)
 
 AC2_ID = "climate.fawad_3010_ea3a_air_conditioner"

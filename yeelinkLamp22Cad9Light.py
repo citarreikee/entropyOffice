@@ -4,8 +4,32 @@ import requests
 
 class YeelinkLamp22Cad9Light:
     def __init__(self, ha_url, token, entity_id):
-        self.set_miot_property_url = "http://192.168.0.18:8123/api/services/xiaomi_miot/set_miot_property"
-        self.call_action_url = "http://192.168.0.18:8123/api/services/xiaomi_miot/call_action"
+        self.tools = {
+        "type": "function",
+        "function": {
+            "name": "ScreenLightControl",
+            "description": "控制显示器挂灯，支持开关、调节亮度、调节色温和状态查询功能",
+            "parameters": {
+            "type": "object",
+            "properties": {
+                "action": {
+                "type": "string",
+                "description": "要执行的操作类型，从以下枚举值中选其一",
+                "enum": ["turn_on", "turn_off", "set_brightness", "set_color_temp", "query_status"]
+                },
+                "brightness": {
+                "type": "number",
+                "description": "亮度，范围:1~100，步长: 1，仅当action为set_brightness时使用",
+                },
+                "color_temp": {
+                "type": "number",
+                "description": "色温，范围:2700~6500，步长: 1，仅当action为set_color_temp时使用",
+                },
+            },
+            "required": ["action"],
+            }
+        }
+        }
         self.ha_url = ha_url.rstrip('/')
         self.headers = {
             "Authorization": f"Bearer {token}",

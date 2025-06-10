@@ -3,6 +3,28 @@ import requests
 
 class OfficeLight:
     def __init__(self, ha_url, token, entity_id):
+        self.tools = {
+        "type": "function",
+        "function": {
+            "name": "OfficeLightControl",
+            "description": "控制办公室基础灯光开关",
+            "parameters": {
+            "type": "object",
+            "properties": {
+                "lightID": {
+                "type": "integer",
+                "description": "要控制的灯组编号",
+                },                
+            },
+            "action": {
+                "type": "string",
+                "description": "要执行的操作类型，从以下枚举值中选其一",
+                "enum": ["turn_on", "turn_off", "query_status"]
+                },
+            "required": ["lightID","action"]
+            }
+        }
+        }
         self.ha_url = ha_url.rstrip('/')
         self.headers = {
             "Authorization": f"Bearer {token}",
