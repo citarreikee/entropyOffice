@@ -62,7 +62,7 @@ class YeelinkLamp22Cad9Light:
         
         attrs = state_data.get('attributes', {})
         # 更新开关状态 (优先使用light.on，其次根据state判断)
-        self._status = attrs.get('light.on', state_data['state'] != 'off')
+        self._status = state_data['state']
         # 更新亮度状态
         self._brightness = attrs.get('light.brightness')
         # 更新色温状态
@@ -125,34 +125,33 @@ class YeelinkLamp22Cad9Light:
     
     def turn_on(self):
         payload = {"entity_id": self.entity_id}
-        res = self.set_property("switch","turn_on",payload)
+        res = self.set_property("light","turn_on",payload)
         
         return f"开灯{'成功' if res.status_code==200 else '失败'}"
     
     def turn_off(self):
         payload = {"entity_id": self.entity_id}
-        res = self.set_property("switch","turn_off",payload)
+        res = self.set_property("light","turn_off",payload)
         
         return f"关灯{'成功' if res.status_code==200 else '失败'}"
     
     def toggle(self):
         payload = {"entity_id": self.entity_id}
-        res = self.set_property("switch","toggle",payload)
+        res = self.set_property("light","toggle",payload)
         
         return f"开关状态切换命令发送{'成功' if res.status_code==200 else '失败'}"
     
 
 # if __name__ == "__main__":
-#     HA_URL = "http://192.168.0.18:8123"
+#     HA_URL = "http://192.168.31.10:8123"
 #     ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI2OTFhNWNjMThlOTM0MmI2OTdmNTVlNGZmNmEwYThlYiIsImlhdCI6MTc0ODg0OTQyMiwiZXhwIjoyMDY0MjA5NDIyfQ.1HTLOmqphNp2Mv--Krj_nvNHkjhWAGCgQ2CztKd4sx8"
     
 #     ENTITY_ID = "light.yeelink_lamp22_cad9_light"
 #     light = YeelinkLamp22Cad9Light(HA_URL,ACCESS_TOKEN,ENTITY_ID)
-#     res = light.turn_off()
+#     res = light.toggle()
 #     print(res)
-#     res = light.turn_on()
-#     print(res)
-
+    
+    
 
 
 

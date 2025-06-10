@@ -63,6 +63,24 @@ def router_event_handler(event_data: dict) -> None:
         "content": message
     })
 
+# 新增光照传感器事件处理函数
+def light_sensor_event_handler(event_data: dict) -> None:
+    """处理光照变化事件"""
+    sensor_id = event_data['sensor_id']
+    event_type = event_data['event_type']
+    
+    if event_type == "illuminance_change":
+        # 格式化消息：使用💡表情表示光照变化
+        message = (f"{time.time()}💡 光照变化通知：{sensor_id} 变化 {event_data['delta']:.1f}级 "
+                   f"({event_data['old_illuminance']:.1f} → {event_data['new_illuminance']:.1f})")
+        
+        # 将事件放入队列
+        event_queue.put({
+            "timestamp": time.time(),
+            "role": "user", 
+            "content": message
+        })
+
 # 注册事件处理器
 th_sensor1.register_event_handler("temp_change", sensor_event_handler)
 th_sensor1.register_event_handler("humidity_change", sensor_event_handler)
@@ -72,18 +90,19 @@ th_sensor3.register_event_handler("temp_change", sensor_event_handler)
 th_sensor3.register_event_handler("humidity_change", sensor_event_handler)
 router.register_event_handler("device_online", router_event_handler)
 router.register_event_handler("device_offline", router_event_handler)
+lux_sensor.register_event_handler("illuminance_change", light_sensor_event_handler)
 
-# # 启动温湿度计监控线程
-# def sensor_monitor():
-#     """后台监控温湿度计"""
-#     while True:
-#         try:
-#             th_sensor1.update_state()
-#             th_sensor2.update_state()
-#             th_sensor3.update_state()
-#             time.sleep(10)  # 每10秒检查一次
-#         except Exception as e:
-#             print(f"温湿度监控异常: {e}")
+# 启动温湿度计监控线程
+def sensor_monitor():
+    """后台监控温湿度计"""
+    while True:
+        try:
+            th_sensor1.update_state()
+            th_sensor2.update_state()
+            th_sensor3.update_state()
+            time.sleep(10)  # 每10秒检查一次
+        except Exception as e:
+            print(f"温湿度监控异常: {e}")
 
 # 新增路由器监控线程
 def router_monitor():
@@ -95,12 +114,25 @@ def router_monitor():
         except Exception as e:
             print(f"路由器监控异常: {e}")
 
+# 新增光照监控线程
+def light_sensor_monitor():
+    """后台监控光照强度变化"""
+    while True:
+        try:
+            lux_sensor.update_illuminance()
+            time.sleep(15)  # 每15秒检查一次
+        except Exception as e:
+            print(f"光照监控异常: {e}")
 
 
 
-# sensor_thread = threading.Thread(target=sensor_monitor, daemon=True)
-# sensor_thread.start()
+
+sensor_thread = threading.Thread(target=sensor_monitor, daemon=True)
+sensor_thread.start()
 
 router_thread = threading.Thread(target=router_monitor, daemon=True)
 router_thread.start()
+
+lux_sensor_thread = threading.Thread(target=light_sensor_monitor, daemon=True)
+lux_sensor_thread.start()
 

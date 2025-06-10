@@ -5,6 +5,7 @@ from th_Sensor import TH_Sensor
 from wifiSpeaker import WifiSpaekerlx06
 from yeelinkLamp22Cad9Light import YeelinkLamp22Cad9Light
 from wifiRouter import WifiRouter
+from lightSensor import VirtualLightSensor
 
 # 初始化办公室基础照明
 MAIN_LIGHT_ID = "switch.xiaomi_2wpro3_de32_middle_switch_service"
@@ -41,5 +42,9 @@ speaker = WifiSpaekerlx06(HA_URL, ACCESS_TOKEN,SPEAKER_ID)
 Y1_LAMP_ID = "light.yeelink_lamp22_cad9_light"
 screen_light1 = YeelinkLamp22Cad9Light(HA_URL, ACCESS_TOKEN,Y1_LAMP_ID)
 
+
 # 初始化路由器
 router = WifiRouter()
+
+# 初始化虚拟光敏传感器
+lux_sensor = VirtualLightSensor(lights=[main_light,aux_light,screen_light1])

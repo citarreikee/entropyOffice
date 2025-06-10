@@ -130,5 +130,22 @@ tools = [
         "required": []
             }
         }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_illuminance",
+            "description": "获取光敏传感器的当前光照强度（1-5级）",
+            "parameters": {
+            "type": "object",
+            "properties": {
+                "sensor_id": {
+                "type": "string",
+                "description": "虚拟传感器的标识符 (默认: virtual_light_sensor)"
+                }
+            },
+            "required": []
+            }
+        }
     }
 ]

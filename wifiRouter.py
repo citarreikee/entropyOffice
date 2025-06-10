@@ -19,10 +19,7 @@ class WifiRouter:
         self.device_map = {
             "Xiaomi14": "192.168.31.27",
             "SamsungGalaxyS21ultra": "192.168.31.143",
-            "DESKTOP-S9174ND": "192.168.31.44",
-            "LaptopZQ": "192.168.31.40",
-            "iPhoneXR": "192.168.31.76",
-            "Mac-mini": "192.168.31.10"
+            "iPhoneXR": "192.168.31.76", 
         }
         self.max_retries = max_retries  # 最大重试次数
         self.timeout = timeout          # 超时时间(秒)

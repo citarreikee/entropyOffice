@@ -297,6 +297,7 @@ async def parse_function_call(model_response, messages):
                     "name": func_name,
                     "content": response_content
                 })
+            # 路由器查询
             elif func_name == "RouterQuery":                
                 try:
                     result = str(router.online_devices)
@@ -316,6 +317,28 @@ async def parse_function_call(model_response, messages):
                     "name": func_name,
                     "content": response_content
                 })
+            # 路由器查询
+            elif func_name == "get_illuminance":                
+                try:
+                    result = str(lux_sensor.final_illuminance)
+                    response_content = result
+                except Exception as e:
+                    response_content = f"光照强度查询出错: {str(e)}"
+                
+                tool_responses.append({
+                    "tool_call_id": tool_call,
+                    "role": "tool",
+                    "name": func_name,
+                    "content": response_content
+                })
+                print({
+                    "tool_call_id": tool_call,
+                    "role": "tool",
+                    "name": func_name,
+                    "content": response_content
+                })
+
+
 
             else:
                 tool_responses.append({
@@ -338,5 +361,5 @@ async def parse_function_call(model_response, messages):
     messages.extend(tool_responses)
     
     # 返回工具响应列表，而不是直接调用模型
-    return tool_responses
+    return tool_responses, messages
 
